@@ -1,111 +1,133 @@
-// Selecao de elementos
-const todoForm = document.querySelector("#todo-form");
-const todoInput = document.querySelector("#todo-input");
-const todoList = document.querySelector("#todo-list");
-const editForm = document.querySelector("#edit-form");
-const editInput = document.querySelector("#edit-input");
-const cancelEditBtn = document.querySelector("#cancel-edit-btn");
+class BoxShadowGenerator {
 
-let oldInputValue;
+    constructor(
+        horizontal,
+        horizontalRef,
+        vertical,
+        verticalRef,
+        blur,
+        blurRef,
+        spread,
+        spreadRef,
+        previewBox,
+        rule,
+        webkitRule,
+        mozRule
+    ) {
+        this.horizontal = horizontal
+        this.horizontalRef = horizontalRef
+        this.vertical = vertical
+        this.verticalRef = verticalRef
+        this.blur = blur
+        this.blurRef = blurRef
+        this.spread = spread
+        this.spreadRef = spreadRef
+        this.previewBox = previewBox
+        this.rule = rule
+        this.webkitRule = webkitRule
+        this.mozRule = mozRule
+    }
 
-// Funcoes
-const saveTodo = (text) => {
-    const todo = document.createElement("div")
-    todo.classList.add("todo")
+    initialize() {
+        this.horizontalRef.value = this.horizontal.value;
+        this.verticalRef.value = this.vertical.value;
+        this.spreadRef.value = this.spread.value;
+        this.blurRef.value = this.blur.value;
 
-    const todoTitle = document.createElement("h3")
-    todoTitle.innerHTML = text;
-    todo.appendChild(todoTitle);
+        this.applyRule();
+        this.showRule();
+    }
 
-    const doneBtn = document.createElement("button");
-    doneBtn.classList.add("finish-todo");
-    doneBtn.innerHTML = '<i class="fa-solid fa-check"><i/>'
-    todo.appendChild(doneBtn)
+    applyRule() {
+        this.previewBox.style.boxShadow = `${this.horizontalRef.value}px  ${this.verticalRef.value}px  ${this.blurRef.value}px ${this.spreadRef.value}px #000000`
+        this.currentRule = this.previewBox.style.boxShadow;
+    }
 
-    const editBtn = document.createElement("button");
-    editBtn.classList.add("edit-todo");
-    editBtn.innerHTML = '<i class="fa-solid fa-pen"><i/>'
-    todo.appendChild(editBtn)
+    showRule() {
+        this.rule.innerText = this.currentRule;
+        this.webkitRule.innerText = this.currentRule;
+        this.mozRule.innerText = this.currentRule;
+    }
 
-    const deleteBtn = document.createElement("button");
-    deleteBtn.classList.add("remove-todo");
-    deleteBtn.innerHTML = '<i class="fa-solid fa-xmark"><i/>';
-    todo.appendChild(deleteBtn)
+    updateValue(type, value) {
 
-    todoList.appendChild(todo);
-
-    todoInput.value = "";
-    todoInput.focus();
-};
-
-const toggleForms = () => {
-    editForm.classList.toggle("hide");
-    todoForm.classList.toggle("hide");
-    todoList.classList.toggle("hide");
-}
-
-const updateTodo = (text) => {
-    const todos = document.querySelectorAll(".todo")
-
-    todos.forEach((todo) => {
-        let todoTitle = todo.querySelector("h3");
-
-        if (todoTitle.innerText === oldInputValue) {
-            todoTitle.innerText = text
+        switch (type) {
+            case "horizontal":
+                this.horizontalRef.value = value;
+                break;
+            case "vertical":
+                this.verticalRef.value = value;
+                break;
+            case "spread":
+                this.spread.value = value;
+                break;
+            case "blur":
+                this.blur.value = value;
+                break;
         }
-    })
+
+        this.applyRule();
+        this.showRule();
+    }
+
 }
 
-// Eventos
-todoForm.addEventListener('submit', (e) => {
-    e.preventDefault();
+// Seleção dos elementos
+const horizontal = document.querySelector("#horizontal")
+const horizontalRef = document.querySelector("#horizontal-value")
+const vertical = document.querySelector("#vertical")
+const verticalRef = document.querySelector("#vertical-value")
+const blur = document.querySelector("#blur")
+const blurRef = document.querySelector("#blur-value")
+const spread = document.querySelector("#spread")
+const spreadRef = document.querySelector("#spread-value")
 
-    const inputValue = todoInput.value;
+const previewBox = document.querySelector("#box")
 
-    if (inputValue) {
-        // Save tarefa
-        saveTodo(inputValue)
-    }
-});
+const rule = document.querySelector("#rule span")
+const webkitRule = document.querySelector("#webkit-rule span")
+const mozRule = document.querySelector("#moz-rule span")
 
-document.addEventListener('click', (e) => {
-    const targetEl = e.target
-    const parentEl = targetEl.closest("div");
-    let todoTitle;
+const boxShadow = new BoxShadowGenerator
+    (
+        horizontal,
+        horizontalRef,
+        vertical,
+        verticalRef,
+        blur,
+        blurRef,
+        spread,
+        spreadRef,
+        previewBox,
+        rule,
+        webkitRule,
+        mozRule
+    );
 
-    if (parentEl && parentEl.querySelector("h3")) {
-        todoTitle = parentEl.querySelector("h3").innerText;
-    }
+boxShadow.initialize()
 
-    if (targetEl.classList.contains("finish-todo")) {
-        parentEl.classList.toggle("done");
-    }
 
-    if (targetEl.classList.contains("remove-todo")) {
-        parentEl.remove();
-    }
+horizontal.addEventListener("input", (e) => {
+    const value = e.target.value
 
-    if (targetEl.classList.contains("edit-todo")) {
-        toggleForms();
-
-        editInput.value = todoTitle
-        oldInputValue = todoTitle
-    }
+    boxShadow.updateValue("horizontal", value)
 })
 
-cancelEditBtn.addEventListener("click", (e) => {
-    e.preventDefault();
-    toggleForms();
-});
+vertical.addEventListener("input", (e) => {
+    const value = e.target.value
 
-editForm.addEventListener("submit", (e) => {
-    e.preventDefault()
-
-    const editInputValue = editInput.value
-
-    if (editInputValue) {
-        updateTodo(editInputValue)
-    }
-
-    toggleForms();
+    boxShadow.updateValue("vertical", value)
 })
+
+spread.addEventListener("input", (e) => {
+    const value = e.target.value
+
+    boxShadow.updateValue("spread", value)
+})
+
+blur.addEventListener("input", (e) => {
+    const value = e.target.value
+
+    boxShadow.updateValue("blur", value)
+})
+//Eventos
